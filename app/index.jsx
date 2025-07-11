@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router'
 import { StyleSheet, Text, View } from 'react-native'
 import Button from '../components/Button'
-import { takePhoto, uploadImage } from '../components/imagePickerHelpers'
+import { takePhoto, uploadImage } from '../components/ImageUpload'
 import ScreenWrapper from '../components/ScreenWrapper'
 import { theme } from '../constants/theme'
 import { hp, wp } from '../helpers/common'
