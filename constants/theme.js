@@ -5,7 +5,7 @@ export const theme = {
         gray: '#e3e3e3',
         darkGray: '#757575',
 
-        emerald: '#10B981',
+        emerald: '#00C26F',
         darkEmerald: '#047857',
         
         text: '#000000',
@@ -13,7 +13,11 @@ export const theme = {
         textDark: '#1D1D1D',
 
         rose: '#ef4444',
-        roseLight: '#f87171'
+        roseLight: '#f87171',
+        lightBlue: '#60a5fa',
+
+        blue: '#2196F3',
+        darkBlue: '#1565C0',
 
     },
     fonts: {

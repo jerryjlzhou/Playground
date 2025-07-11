@@ -4,7 +4,6 @@ import { theme } from '../constants/theme'
 import { hp } from '../helpers/common'
 import Loading from '../components/Loading'
 
-
 const Button = ({
     buttonStyle,
     textStyle,
@@ -41,7 +40,7 @@ export default Button
 
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: theme.colors.yellow,
+        backgroundColor: theme.colors.blue,
         height: hp(6),
         justifyContent: 'center',
         alignItems: 'center',
@@ -50,7 +49,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: hp(2.5),
-        color: 'black',
+        color: 'white',
         fontWeight: theme.fonts.bold
     }
 })
