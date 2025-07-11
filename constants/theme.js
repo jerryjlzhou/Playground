@@ -14,10 +14,18 @@ export const theme = {
 
         rose: '#ef4444',
         roseLight: '#f87171',
-        lightBlue: '#60a5fa',
 
-        blue: '#2196F3',
-        darkBlue: '#1565C0',
+        blue: '#2196F3', 
+        darkBlue: '#1565C0', 
+        vividBlue: '#3B82F6',
+        vividBlueDark: '#2563EB',
+        slateGray: '#4B5563', 
+        midnight: '#111827',
+        navy: '#1E293B', 
+        white: '#FFFFFF',
+        silver: '#9CA3AF', 
+        lightSilver: '#D1D5DB', 
+        ashGray: '#6B7280', 
 
     },
     fonts: {
