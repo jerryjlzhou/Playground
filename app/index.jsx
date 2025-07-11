@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, Text, View } from 'react-native'
 import Button from '../components/Button'
+import { takePhoto, uploadImage } from '../components/imagePickerHelpers'
 import ScreenWrapper from '../components/ScreenWrapper'
 import { theme } from '../constants/theme'
 import { hp, wp } from '../helpers/common'
@@ -10,15 +10,19 @@ const home = () => {
   const router = useRouter()
 
   const handleTakePhoto = () => {
-    // TODO: Implement camera functionality
-    console.log('Opening camera...')
-    // router.push('/playground') // Navigate to playground after photo capture
+    takePhoto((photo) => {
+      if (photo?.uri) {
+        router.push({ pathname: '/playground', params: { imageUri: photo.uri } });
+      }
+    });
   }
 
   const handleUploadImage = () => {
-    // TODO: Implement image picker functionality
-    console.log('Opening image picker...')
-    // router.push('/playground') // Navigate to playground after image selection
+    uploadImage((image) => {
+      if (image?.uri) {
+        router.push({ pathname: '/playground', params: { imageUri: image.uri } });
+      }
+    });
   }
 
   return (
