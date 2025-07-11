@@ -1,28 +1,49 @@
+import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
 import { StyleSheet, Text, View } from 'react-native'
 import Button from '../components/Button'
-import { takePhoto, uploadImage } from '../components/ImageUpload'
 import ScreenWrapper from '../components/ScreenWrapper'
 import { theme } from '../constants/theme'
 import { hp, wp } from '../helpers/common'
 
-const home = () => {
+const Home = () => {
   const router = useRouter()
 
-  const handleTakePhoto = () => {
-    takePhoto((photo) => {
-      if (photo?.uri) {
-        router.push({ pathname: '/playground', params: { imageUri: photo.uri } });
-      }
+  const handleTakePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Camera permission is required!');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 1,
     });
+    if (!result.canceled && result.assets?.[0]?.uri) {
+      router.push({ 
+        pathname: '/editPage', 
+        params: { imageUri: result.assets[0].uri } 
+      });
+    }
   }
 
-  const handleUploadImage = () => {
-    uploadImage((image) => {
-      if (image?.uri) {
-        router.push({ pathname: '/playground', params: { imageUri: image.uri } });
-      }
-    });
+  const handleUploadImage = async () => {
+    
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 1,
+    })
+    
+    if (!result.canceled && result.assets?.[0]?.uri) {
+      router.push({ 
+        pathname: '/editPage', 
+        params: { imageUri: result.assets[0].uri } 
+      })
+    }
   }
 
   return (
@@ -85,7 +106,7 @@ const home = () => {
   )
 }
 
-export default home
+export default Home
 
 const styles = StyleSheet.create({
   container: {
