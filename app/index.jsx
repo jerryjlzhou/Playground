@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, Text, View } from 'react-native'
 import Button from '../components/Button'
 import ScreenWrapper from '../components/ScreenWrapper'
@@ -21,7 +22,7 @@ const home = () => {
   }
 
   return (
-    <ScreenWrapper bg="#111827">
+    <ScreenWrapper bg={theme.colors.midnight}>
       <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.headerContainer}>
@@ -85,8 +86,6 @@ export default home
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: wp(4),
-    backgroundColor: theme.colors.midnight,
   },
   
   // Header Styles
