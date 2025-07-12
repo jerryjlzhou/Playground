@@ -6,8 +6,8 @@ import numpy as np
 from PIL import Image
 
 # --- CONFIG ---
-INPUT_IMAGE = 'components/ImageProcessing/input/testQ1.png'  # Updated to match actual image location
-OUTPUT_DIR = 'components/ImageProcessing/output'  # Directory to save results
+INPUT_IMAGE = 'components/ImageProcessing/input/testQ2.png'  # Updated to match actual image location
+OUTPUT_DIR = 'assets/images/'  # Directory to save results
 
 # --- UTILS ---
 def ensure_dir(path):
@@ -24,6 +24,8 @@ def save_transparent_png(shape_mask, orig_img, bbox, out_path):
     # Convert cropped image to RGBA
     rgba = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGBA)
     rgba[..., 3] = alpha
+    # Set background pixels to fully transparent (0,0,0,0)
+    rgba[(alpha == 0)] = [0, 0, 0, 0]
     Image.fromarray(rgba).save(out_path)
 
 def main():
