@@ -1,7 +1,9 @@
+import * as MediaLibrary from 'expo-media-library'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useRef, useState } from 'react'
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { captureRef } from 'react-native-view-shot'
 import Icon from '../assets/icons'
 import Button from '../components/Button'
 import { theme } from '../constants/theme'
@@ -17,6 +19,7 @@ const DrawingPage = () => {
   const [paths, setPaths] = useState([])
   const [currentPath, setCurrentPath] = useState('')
   const isDrawing = useRef(false)
+  const drawingAreaRef = useRef(null)
 
   const handleTouchStart = (event) => {
     const { locationX, locationY } = event.nativeEvent
@@ -50,6 +53,58 @@ const DrawingPage = () => {
     }
   }
 
+  const saveDrawing = async () => {
+    try {
+      // Check if ref is available
+      if (!drawingAreaRef.current) {
+        Alert.alert('Error', 'Drawing area not ready. Please try again.')
+        return
+      }
+
+      // Request media library permissions
+      const { status } = await MediaLibrary.requestPermissionsAsync()
+      
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission required', 
+          'Please grant permission to save images to your photo library'
+        )
+        return
+      }
+
+      // Add a small delay to ensure the component is fully rendered
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Capture the drawing area as an image
+      const uri = await captureRef(drawingAreaRef.current, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      })
+
+      // Save to gallery
+      const asset = await MediaLibrary.createAssetAsync(uri)
+      await MediaLibrary.createAlbumAsync('Playground Drawings', asset, false)
+      
+      Alert.alert(
+        'Saved!', 
+        'Your drawing has been saved to your photo library',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.back()
+          }
+        ]
+      )
+    } catch (error) {
+      console.error('Save failed:', error)
+      Alert.alert(
+        'Save failed', 
+        error.message || 'Could not save the drawing'
+      )
+    }
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -64,7 +119,11 @@ const DrawingPage = () => {
       </View>
 
       {/* Drawing Area */}
-      <View style={styles.drawingContainer}>
+      <View 
+        style={styles.drawingContainer} 
+        ref={drawingAreaRef}
+        collapsable={false}
+      >
         {/* Background Image */}
         <Image
           source={{ uri: imageUri }}
@@ -118,10 +177,7 @@ const DrawingPage = () => {
         
         <Button 
           title="Save Drawing"
-          onPress={() => {
-            router.back()
-            // Could implement actual save functionality here
-          }}
+          onPress={saveDrawing}
           buttonStyle={styles.saveButton}
           textStyle={styles.saveButtonText}
         />
@@ -134,6 +190,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.midnight,
+    paddingTop: hp(2),
   },
   header: {
     flexDirection: 'row',
