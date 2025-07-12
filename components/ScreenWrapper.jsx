@@ -1,10 +1,10 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
 
 const ScreenWrapper = ({children, bg}) => {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: bg}} edges={['left', 'right']}>
+    <View style={{flex: 1, backgroundColor: bg}}>
       {children}
-    </SafeAreaView>
+    </View>
   )
 }
 

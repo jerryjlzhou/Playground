@@ -1,7 +1,5 @@
-import * as FileSystem from 'expo-file-system'
-import * as MediaLibrary from 'expo-media-library'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Alert, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 import Icon from '../assets/icons'
 import Button from '../components/Button'
 import ScreenWrapper from '../components/ScreenWrapper'
@@ -17,42 +15,11 @@ const EditPage = () => {
     router.push('/playground');
   }
 
-  const handleSave = async () => {
-    
-    try {
-      // 1. Request permissions
-      const { status } = await MediaLibrary.requestPermissionsAsync()
-      
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permission required', 
-          'Please grant permission to save images to your photo library'
-        )
-        return
-      }
-      
-      // 2. Get file info
-      const fileInfo = await FileSystem.getInfoAsync(imageUri)
-      
-      if (!fileInfo.exists) {
-        throw new Error('Image file not found')
-      }
-      
-      // 3. Save to gallery
-      const asset = await MediaLibrary.createAssetAsync(imageUri)
-      await MediaLibrary.createAlbumAsync('Playground', asset, false)
-      
-      Alert.alert(
-        'Saved!', 
-        'Image has been saved to your photo library'
-      )
-    } catch (error) {
-      console.error('Save failed:', error)
-      Alert.alert(
-        'Save failed', 
-        error.message || 'Could not save the image'
-      )
-    } 
+  const handleDraw = () => {
+    router.push({
+      pathname: '/drawingPage',
+      params: { imageUri }
+    })
   }
 
   return (
@@ -60,9 +27,17 @@ const EditPage = () => {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Pressable 
+            onPress={() => {
+              router.replace('/');
+            }}
+            style={({ pressed }) => [
+              styles.backButton,
+              { opacity: pressed ? 0.7 : 1 }
+            ]}
+          >
             <Icon name="backbutton" size={hp(3.6)} color={theme.colors.white} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.title}>Edit Image</Text>
           <View style={{ width: wp(10) }} />
         </View>
@@ -74,16 +49,6 @@ const EditPage = () => {
             style={{ flex: 1, width: undefined, height: undefined }}
             resizeMode="contain"
           />
-          {/* Icons on the right, horizontal and a bit lower */}
-          <View style={{ position: 'absolute', right: wp(4), bottom: hp(10), flexDirection: 'row', alignItems: 'center', gap: wp(4) }}>
-            <Pressable>
-                <Icon name="draw" size={hp(3.5)} color="white"/>
-            </Pressable>
-
-            <Pressable onPress={handleSave}>
-                <Icon name="save" size={hp(3.5)} color="white"/>
-            </Pressable>
-          </View>
         </View>
         
 
@@ -95,6 +60,13 @@ const EditPage = () => {
                   onPress={handleExtractShapes}
                   buttonStyle={[styles.button]}
                   textStyle={[styles.buttonText, {fontWeight: 'bold'}]}
+                />
+                
+                <Button 
+                  title="Draw on Image"
+                  onPress={handleDraw}
+                  buttonStyle={[styles.secondaryButton]}
+                  textStyle={[styles.secondaryButtonText, {fontWeight: 'bold'}]}
                 />
             </View>
 
@@ -119,7 +91,12 @@ const styles = StyleSheet.create({
     marginBottom: hp(0),
   },
   backButton: {
-    padding: wp(2),
+    padding: wp(4),
+    minWidth: wp(12),
+    minHeight: hp(6),
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
   },
   backButtonText: {
     color: theme.colors.white,
@@ -138,7 +115,7 @@ const styles = StyleSheet.create({
     marginBottom: hp(5), // add a bit of space from the bottom
   },
   icons: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 18,
@@ -163,6 +140,19 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   buttonText: {
+    color: theme.colors.white,
+    fontSize: wp(4.5),
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: theme.colors.slateGray,
+    borderRadius: wp(4),
+    paddingVertical: hp(2.2),
+    paddingHorizontal: wp(25),
+  },
+  secondaryButtonText: {
     color: theme.colors.white,
     fontSize: wp(4.5),
     fontWeight: '600',
