@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, PinchGestureHandler, RotationGestureHandler } from 'react-native-gesture-handler';
@@ -7,20 +8,30 @@ import BackButtonIcon from '../assets/icons/BackButton.jsx';
 import { theme } from '../constants/theme';
 
 const { width, height } = Dimensions.get('window');
-
-const imageSources = [
-  require('../assets/images/shape_1.png'),
-  require('../assets/images/shape_2.png'),
-  require('../assets/images/shape_3.png'),
-  require('../assets/images/shape_4.png'),
-  require('../assets/images/shape_5.png'),
-  require('../assets/images/shape_6.png'),
-  require('../assets/images/shape_7.png'),
-];
 const IMAGE_SIZE = 150; // Slightly bigger than before
 
 const Playground = () => {
   const navigation = useNavigation();
+  const [imageSources, setImageSources] = useState([]);
+
+  useEffect(() => {
+    const fetchProcessedImages = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/processed-images');
+        if (response.ok) {
+          const imageUrls = await response.json();
+          setImageSources(imageUrls);
+        } else {
+          console.error('Failed to fetch processed images.');
+        }
+      } catch (error) {
+        console.error('Error fetching processed images:', error);
+      }
+    };
+
+    fetchProcessedImages();
+  }, []);
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.white }}>
       <View style={styles.header}>
@@ -35,9 +46,7 @@ const Playground = () => {
           const numCols = 3;
           const col = idx % numCols;
           const row = Math.floor(idx / numCols);
-          // Calculate gap so all images fit within the screen
           const gap = (width - (numCols * IMAGE_SIZE)) / (numCols + 1);
-          // Ensure initialX and initialY keep images within bounds
           const initialX = Math.max(gap + col * (IMAGE_SIZE + gap), 0);
           const initialY = 32 + row * (IMAGE_SIZE + 24); // 32px from top, 24px vertical gap
           const translateX = useSharedValue(initialX);
@@ -87,7 +96,7 @@ const Playground = () => {
                 <PinchGestureHandler onGestureEvent={pinchHandler}>
                   <Animated.View>
                     <RotationGestureHandler onGestureEvent={rotateHandler}>
-                      <Animated.Image source={source} style={styles.image} resizeMode="contain" />
+                      <Animated.Image source={{ uri: source }} style={styles.image} resizeMode="contain" />
                     </RotationGestureHandler>
                   </Animated.View>
                 </PinchGestureHandler>

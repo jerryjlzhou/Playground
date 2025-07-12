@@ -30,21 +30,38 @@ const Home = () => {
   }
 
   const handleUploadImage = async () => {
-    
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [3, 4],
       quality: 1,
-    })
-    
+    });
+
     if (!result.canceled && result.assets?.[0]?.uri) {
-      router.push({ 
-        pathname: '/editPage', 
-        params: { imageUri: result.assets[0].uri } 
-      })
+      const formData = new FormData();
+      formData.append('image', {
+        uri: result.assets[0].uri,
+        name: 'uploaded_image.jpg',
+        type: 'image/jpeg',
+      });
+
+      try {
+        const response = await fetch('http://192.168.1.136:3001/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          alert('Image uploaded and processed successfully!');
+        } else {
+          alert('Failed to upload image.');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('An error occurred while uploading the image.');
+      }
     }
-  }
+  };
 
   return (
     <ScreenWrapper bg={theme.colors.midnight}>
