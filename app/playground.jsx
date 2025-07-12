@@ -25,7 +25,7 @@ const Playground = () => {
     <View style={{ flex: 1, backgroundColor: theme.colors.white }}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <BackButtonIcon color={theme.colors.navy} width={28} height={28} />
+          <BackButtonIcon color='white' width={28} height={28} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Playground</Text>
         <View style={{ width: 40 }} />
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
-    backgroundColor: theme.colors.white,
+    backgroundColor: theme.colors.midnight,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.gray,
     zIndex: 10,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: theme.colors.navy,
+    color: theme.colors.white,
     textAlign: 'center',
     flex: 1,
   },

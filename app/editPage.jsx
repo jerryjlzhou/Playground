@@ -68,28 +68,28 @@ const EditPage = () => {
         </View>
         
         {/* Image Preview */}
-        <View style={{ flex: 1, width: '100%', marginTop: hp(-10), marginBottom: hp(2)}}>
+        <View style={{ flex: 1, width: '100%', marginTop: hp(-10), marginBottom: hp(2), position: 'relative' }}>
           <Image
             source={{ uri: imageUri }}
             style={{ flex: 1, width: undefined, height: undefined }}
             resizeMode="contain"
           />
+          {/* Icons on the right, horizontal and a bit lower */}
+          <View style={{ position: 'absolute', right: wp(4), bottom: hp(10), flexDirection: 'row', alignItems: 'center', gap: wp(4) }}>
+            <Pressable>
+                <Icon name="draw" size={hp(3.5)} color="white"/>
+            </Pressable>
+
+            <Pressable onPress={handleSave}>
+                <Icon name="save" size={hp(3.5)} color="white"/>
+            </Pressable>
+          </View>
         </View>
+        
+
 
         <View style={styles.footer}>
              <View style={styles.icons}>
-                <Pressable>
-                    <Icon name="draw" size={hp(3.5)} color="white"/>
-                </Pressable>
-
-                <Pressable>
-                    <Icon name="select" size={hp(3.5)} color="white"/>
-                </Pressable>
-
-                <Pressable onPress={handleSave}>
-                    <Icon name="save" size={hp(3.5)} color="white"/>
-                </Pressable>
-
                 <Button 
                   title="Extract shapes"
                   onPress={handleExtractShapes}
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: hp(1), // slightly higher
-    marginBottom: hp(2), // add a bit of space from the bottom
+    marginBottom: hp(5), // add a bit of space from the bottom
   },
   icons: {
     flexDirection: 'row',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.vividBlue,
     borderRadius: wp(4),
     paddingVertical: hp(2.2),
-    paddingHorizontal: wp(10),
+    paddingHorizontal: wp(25),
     shadowColor: theme.colors.vividBlue,
     shadowOffset: {
       width: 0,
