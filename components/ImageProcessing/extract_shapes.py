@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 
 # --- CONFIG ---
-INPUT_IMAGE = 'components/ImageProcessing/input/input.jpg'  # Updated to match actual image location
+INPUT_IMAGE = 'input/testQ2.png'  # Updated to match actual image location
 OUTPUT_DIR = 'components/ImageProcessing/output'  # Directory to save results
 
 # --- UTILS ---
