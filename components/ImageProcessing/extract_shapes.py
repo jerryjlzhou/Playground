@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 
 # --- CONFIG ---
-INPUT_IMAGE = 'input/testQ2.png'  # Updated to match actual image location
+INPUT_IMAGE = 'components/ImageProcessing/input/testQ1.png'  # Updated to match actual image location
 OUTPUT_DIR = 'components/ImageProcessing/output'  # Directory to save results
 
 # --- UTILS ---
@@ -16,13 +16,14 @@ def ensure_dir(path):
 
 def save_transparent_png(shape_mask, orig_img, bbox, out_path):
     x, y, w, h = bbox
-    # Crop the shape
+    # Crop the shape and mask
     cropped = orig_img[y:y+h, x:x+w]
-    # mask_cropped = shape_mask[y:y+h, x:x+w]
-    # # Create alpha channel
-    # alpha = (mask_cropped * 255).astype(np.uint8)
+    mask_cropped = shape_mask[y:y+h, x:x+w]
+    # Create alpha channel: shape is opaque (255), background is transparent (0)
+    alpha = np.where(mask_cropped > 0, 255, 0).astype(np.uint8)
+    # Convert cropped image to RGBA
     rgba = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGBA)
-    # rgba[..., 3] = alpha
+    rgba[..., 3] = alpha
     Image.fromarray(rgba).save(out_path)
 
 def main():
