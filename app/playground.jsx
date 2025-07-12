@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { useLocalSearchParams } from 'expo-router';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, PinchGestureHandler, RotationGestureHandler } from 'react-native-gesture-handler';
 import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
@@ -8,19 +9,37 @@ import { theme } from '../constants/theme';
 
 const { width, height } = Dimensions.get('window');
 
-const imageSources = [
-  require('../assets/images/shape_1.png'),
-  require('../assets/images/shape_2.png'),
-  require('../assets/images/shape_3.png'),
-  require('../assets/images/shape_4.png'),
-  require('../assets/images/shape_5.png'),
-  require('../assets/images/shape_6.png'),
-  require('../assets/images/shape_7.png'),
-];
-const IMAGE_SIZE = 150; // Slightly bigger than before
+const IMAGE_SIZE = 150;
 
 const Playground = () => {
   const navigation = useNavigation();
+  const params = useLocalSearchParams();
+  
+  // Get shapes from route params, fallback to default shapes if none provided
+  let imageSources = [];
+  
+  try {
+    const shapesParam = params.shapes;
+    if (shapesParam) {
+      const shapeBase64List = JSON.parse(shapesParam);
+      imageSources = shapeBase64List.map(base64 => ({ uri: `data:image/png;base64,${base64}` }));
+    }
+  } catch (error) {
+    console.error('Error parsing shapes:', error);
+  }
+  
+  // Fallback to default shapes if no processed shapes available
+  if (imageSources.length === 0) {
+    imageSources = [
+      require('../assets/images/shape_1.png'),
+      require('../assets/images/shape_2.png'),
+      require('../assets/images/shape_3.png'),
+      require('../assets/images/shape_4.png'),
+      require('../assets/images/shape_5.png'),
+      require('../assets/images/shape_6.png'),
+      require('../assets/images/shape_7.png'),
+    ];
+  }
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.white }}>
       <View style={styles.header}>

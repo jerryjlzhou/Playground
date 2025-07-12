@@ -1,19 +1,55 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
+import { useState } from 'react'
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native'
 import Icon from '../assets/icons'
 import Button from '../components/Button'
 import ScreenWrapper from '../components/ScreenWrapper'
 import { theme } from '../constants/theme'
 import { hp, wp } from '../helpers/common'
 
+const SERVER_URL = ''; // PUT LOCAL IP HERE 
+
 const EditPage = () => {
   const params = useLocalSearchParams()
   const { imageUri } = params
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
   const handleExtractShapes = async () => {
-    router.push('/playground');
-  }
+    setLoading(true);
+    try {
+      // Create form data
+      const formData = new FormData();
+      formData.append('image', {
+        uri: imageUri,
+        name: 'image.jpg',
+        type: 'image/jpeg',
+      });
+      // Send to server
+      const response = await fetch(SERVER_URL, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        // Navigate to playground with results
+        router.push({
+          pathname: '/playground',
+          params: { shapes: JSON.stringify(data.shapes) },
+        });
+      } else {
+        alert('Image processing failed: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Processing error:', error);
+      alert('Image processing failed. Make sure the server is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDraw = () => {
     router.push({
@@ -51,22 +87,30 @@ const EditPage = () => {
           />
         </View>
         
-
+        {/* Loading Overlay */}
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={theme.colors.vividBlue} />
+            <Text style={styles.loadingText}>Extracting shapes...</Text>
+          </View>
+        )}
 
         <View style={styles.footer}>
              <View style={styles.icons}>
                 <Button 
-                  title="Extract shapes"
+                  title={loading ? "Processing..." : "Extract shapes"}
                   onPress={handleExtractShapes}
-                  buttonStyle={[styles.button]}
+                  buttonStyle={[styles.button, loading && styles.disabledButton]}
                   textStyle={[styles.buttonText, {fontWeight: 'bold'}]}
+                  disabled={loading}
                 />
                 
                 <Button 
                   title="Draw on Image"
                   onPress={handleDraw}
-                  buttonStyle={[styles.secondaryButton]}
+                  buttonStyle={[styles.secondaryButton, loading && styles.disabledButton]}
                   textStyle={[styles.secondaryButtonText, {fontWeight: 'bold'}]}
+                  disabled={loading}
                 />
             </View>
 
@@ -120,7 +164,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 18,
   },
-    buttonSpacing: {
+  buttonSpacing: {
     marginBottom: hp(2),
     width: '100%',
     maxWidth: wp(80),
@@ -157,6 +201,25 @@ const styles = StyleSheet.create({
     fontSize: wp(4.5),
     fontWeight: '600',
   },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  loadingText: {
+    color: theme.colors.white,
+    fontSize: wp(4),
+    marginTop: hp(2),
+  },
 })
 
-export default EditPage
+export default EditPage;

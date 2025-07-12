@@ -30,7 +30,6 @@ const Home = () => {
   }
 
   const handleUploadImage = async () => {
-    
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
@@ -42,7 +41,7 @@ const Home = () => {
       router.push({ 
         pathname: '/editPage', 
         params: { imageUri: result.assets[0].uri } 
-      })
+      });
     }
   }
 
