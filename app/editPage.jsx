@@ -1,18 +1,21 @@
+import * as FileSystem from 'expo-file-system'
+import * as MediaLibrary from 'expo-media-library'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Icon from '../assets/icons'
+import Button from '../components/Button'
 import ScreenWrapper from '../components/ScreenWrapper'
 import { theme } from '../constants/theme'
 import { hp, wp } from '../helpers/common'
-import { Alert } from 'react-native'
-import * as FileSystem from 'expo-file-system'
-import * as MediaLibrary from 'expo-media-library'
-
 
 const EditPage = () => {
   const params = useLocalSearchParams()
   const { imageUri } = params
   const router = useRouter()
+
+  const handleExtractShapes = async () => {
+    router.push('/playground');
+  }
 
   const handleSave = async () => {
     
@@ -65,14 +68,12 @@ const EditPage = () => {
         </View>
         
         {/* Image Preview */}
-        <View style={styles.imageContainer}>
-          {imageUri && (
-            <Image 
-              source={{ uri: imageUri }} 
-              style={styles.image} 
-              resizeMode="contain"
-            />
-          )}
+        <View style={{ flex: 1, width: '100%', marginTop: hp(-10), marginBottom: hp(2)}}>
+          <Image
+            source={{ uri: imageUri }}
+            style={{ flex: 1, width: undefined, height: undefined }}
+            resizeMode="contain"
+          />
         </View>
 
         <View style={styles.footer}>
@@ -88,6 +89,13 @@ const EditPage = () => {
                 <Pressable onPress={handleSave}>
                     <Icon name="save" size={hp(3.5)} color="white"/>
                 </Pressable>
+
+                <Button 
+                  title="Extract shapes"
+                  onPress={handleExtractShapes}
+                  buttonStyle={[styles.button]}
+                  textStyle={[styles.buttonText, {fontWeight: 'bold'}]}
+                />
             </View>
 
         </View>
@@ -100,15 +108,15 @@ const EditPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: wp(4),
-    paddingTop: hp(4),
+    paddingHorizontal: wp(0),
+    paddingTop: hp(2),
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: hp(1),
-    marginBottom: hp(2),
+    marginBottom: hp(0),
   },
   backButton: {
     padding: wp(2),
@@ -122,29 +130,43 @@ const styles = StyleSheet.create({
     fontSize: wp(5),
     fontWeight: '600',
   },
-  imageContainer: {
-    flex: 1,
-    backgroundColor: theme.colors.navy,
-    borderRadius: theme.radius.lg,
-    overflow: 'hidden',
-    marginBottom: hp(2),
-    paddingHorizontal: wp()
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: hp(2),
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: hp(1), // slightly higher
+    marginBottom: hp(2), // add a bit of space from the bottom
   },
   icons: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 18,
-  }
+  },
+    buttonSpacing: {
+    marginBottom: hp(2),
+    width: '100%',
+    maxWidth: wp(80),
+  },
+  button: {
+    backgroundColor: theme.colors.vividBlue,
+    borderRadius: wp(4),
+    paddingVertical: hp(2.2),
+    paddingHorizontal: wp(10),
+    shadowColor: theme.colors.vividBlue,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  buttonText: {
+    color: theme.colors.white,
+    fontSize: wp(4.5),
+    fontWeight: '600',
+  },
 })
 
 export default EditPage
