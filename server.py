@@ -72,7 +72,7 @@ def process_image_with_opencv(image_path):
     min_area = 2000  # Increased minimum area to avoid text/noise (was 500)
     min_width = 30   # Minimum width to avoid text (was 5)
     min_height = 30  # Minimum height to avoid text (was 5)
-    max_area = 50000 # Maximum area to avoid detecting the entire page
+    max_area = 100000 # Maximum area to avoid detecting the entire page
     
     for cnt in contours:
         area = cv2.contourArea(cnt)

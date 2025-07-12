@@ -7,7 +7,7 @@ import ScreenWrapper from '../components/ScreenWrapper'
 import { theme } from '../constants/theme'
 import { hp, wp } from '../helpers/common'
 
-const SERVER_URL = ''; // PUT LOCAL IP HERE 
+const SERVER_URL = 'http://IPADDRESSHERE/process'; 
 
 const EditPage = () => {
   const params = useLocalSearchParams()

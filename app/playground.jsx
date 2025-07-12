@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { useLocalSearchParams } from 'expo-router';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, PinchGestureHandler, RotationGestureHandler } from 'react-native-gesture-handler';
 import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
@@ -9,11 +10,13 @@ import { theme } from '../constants/theme';
 
 const { width, height } = Dimensions.get('window');
 
-const IMAGE_SIZE = 150;
+const MAX_SIZE = 150; // Maximum size for any dimension
+const MIN_SIZE = 50;  // Minimum size for any dimension
 
 const Playground = () => {
   const navigation = useNavigation();
   const params = useLocalSearchParams();
+  const [imageSizes, setImageSizes] = useState([]);
   
   // Get shapes from route params, fallback to default shapes if none provided
   let imageSources = [];
@@ -40,6 +43,55 @@ const Playground = () => {
       require('../assets/images/shape_7.png'),
     ];
   }
+
+  // Get image dimensions for each source
+  useEffect(() => {
+    const getImageDimensions = async () => {
+      const sizes = await Promise.all(
+        imageSources.map((source) => {
+          return new Promise((resolve) => {
+            Image.getSize(
+              source.uri || Image.resolveAssetSource(source).uri,
+              (width, height) => {
+                // Calculate size while maintaining aspect ratio
+                const aspectRatio = width / height;
+                let displayWidth, displayHeight;
+                
+                if (width > height) {
+                  // Landscape orientation
+                  displayWidth = Math.min(width, MAX_SIZE);
+                  displayHeight = displayWidth / aspectRatio;
+                } else {
+                  // Portrait orientation
+                  displayHeight = Math.min(height, MAX_SIZE);
+                  displayWidth = displayHeight * aspectRatio;
+                }
+                
+                // Ensure minimum size
+                if (displayWidth < MIN_SIZE) {
+                  displayWidth = MIN_SIZE;
+                  displayHeight = displayWidth / aspectRatio;
+                }
+                if (displayHeight < MIN_SIZE) {
+                  displayHeight = MIN_SIZE;
+                  displayWidth = displayHeight * aspectRatio;
+                }
+                
+                resolve({ width: displayWidth, height: displayHeight });
+              },
+              () => {
+                // Fallback if image size can't be determined
+                resolve({ width: 120, height: 120 });
+              }
+            );
+          });
+        })
+      );
+      setImageSizes(sizes);
+    };
+
+    getImageDimensions();
+  }, [imageSources]);
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.white }}>
       <View style={styles.header}>
@@ -50,19 +102,26 @@ const Playground = () => {
         <View style={{ width: 40 }} />
       </View>
       <GestureHandlerRootView style={styles.container}>
-        {imageSources.map((source, idx) => {
-          const numCols = 3;
+        {imageSources.slice().reverse().map((source, idx) => {
+          // Use calculated size or fallback (reverse the index for size lookup)
+          const originalIdx = imageSources.length - 1 - idx;
+          const imageSize = imageSizes[originalIdx] || { width: 120, height: 120 };
+          
+          const numCols = 2; // Reduced from 3 to 2 for more spacing
           const col = idx % numCols;
           const row = Math.floor(idx / numCols);
-          // Calculate gap so all images fit within the screen
-          const gap = (width - (numCols * IMAGE_SIZE)) / (numCols + 1);
-          // Ensure initialX and initialY keep images within bounds
-          const initialX = Math.max(gap + col * (IMAGE_SIZE + gap), 0);
-          const initialY = 32 + row * (IMAGE_SIZE + 24); // 32px from top, 24px vertical gap
+          // Calculate gap with more generous spacing
+          const horizontalGap = (width - (numCols * imageSize.width)) / (numCols + 1);
+          const verticalGap = 40; // Increased from 24px to 40px
+          // Ensure initialX and initialY keep images within bounds with padding
+          const screenPadding = 20; // Add padding from screen edges
+          const initialX = Math.max(horizontalGap + col * (imageSize.width + horizontalGap), screenPadding);
+          const initialY = 60 + row * (imageSize.height + verticalGap); // Increased from 32px to 60px top margin
           const translateX = useSharedValue(initialX);
           const translateY = useSharedValue(initialY);
           const scale = useSharedValue(1);
           const rotation = useSharedValue(0);
+          // ...existing gesture handlers...
           const panHandler = useAnimatedGestureHandler({
             onStart: (_, ctx) => {
               ctx.startX = translateX.value;
@@ -91,8 +150,8 @@ const Playground = () => {
           });
           const animatedStyle = useAnimatedStyle(() => ({
             position: 'absolute',
-            width: IMAGE_SIZE,
-            height: IMAGE_SIZE,
+            width: imageSize.width,
+            height: imageSize.height,
             transform: [
               { translateX: translateX.value },
               { translateY: translateY.value },
@@ -106,7 +165,11 @@ const Playground = () => {
                 <PinchGestureHandler onGestureEvent={pinchHandler}>
                   <Animated.View>
                     <RotationGestureHandler onGestureEvent={rotateHandler}>
-                      <Animated.Image source={source} style={styles.image} resizeMode="contain" />
+                      <Animated.Image 
+                        source={source} 
+                        style={{ width: imageSize.width, height: imageSize.height }} 
+                        resizeMode="contain" 
+                      />
                     </RotationGestureHandler>
                   </Animated.View>
                 </PinchGestureHandler>
@@ -147,10 +210,6 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
     textAlign: 'center',
     flex: 1,
-  },
-  image: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
   },
 });
 
